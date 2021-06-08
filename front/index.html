@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="encs"></table>
+
+    <br />
+    <br />
+    <br />
+
+    <table id="linhas"></table>
+    <br />
+    <br />
+    <br />
+
+    <button onclick="getData()">Buscar dados</button>
+    <button onclick="getData10()">Buscar dados a cada 10 segundos</button>
+
+    <script>
+      const $ = (e) => document.querySelector(e);
+
+      (() => {
+        // PREENCHE TITULO DAS COLUNAS
+        const fillTable = (table, data) => {
+          const tr = document.createElement("tr");
+
+          data.forEach((el) => {
+            const td = document.createElement("td");
+
+            td.innerText = el;
+
+            tr.appendChild(td);
+          });
+
+          table.appendChild(tr);
+        };
+
+        // DEFINE AS COLUNAS
+        const lines = [
+          "Id",
+          "Encomenda Id",
+          "Designação",
+          "Preço",
+          "Quantidade",
+        ];
+        const encs = ["Id", "Client Id", "Nome", "Morada"];
+
+        fillTable($("#encs"), encs);
+        fillTable($("#linhas"), lines);
+
+        // PEGA DADOS A CADA 10SEG
+        const getData10 = () => {
+          getData();
+          setInterval(() => getData(), 10000);
+        };
+
+        // PEGA DADOS
+        const getData = () => {
+          $("#encs").innerHTML = "";
+          $("#linhas").innerHTML = "";
+
+          fillTable($("#encs"), encs);
+          fillTable($("#linhas"), lines);
+
+          fetch("http://localhost:3001/alldata").then((resp) =>
+            resp.json().then(({ lines, encs }) => {
+              console.log(lines, encs);
+              fillTableWithData($("#encs"), encs);
+              fillTableWithData($("#linhas"), lines);
+            })
+          );
+        };
+
+        // PREENCHE TABELA COM DADOS
+        const fillTableWithData = (table, data) => {
+          data.forEach((el) => {
+            const tr = document.createElement("tr");
+
+            Object.keys(el).forEach((key) => {
+              const td = document.createElement("td");
+
+              td.innerText = el[key];
+
+              tr.appendChild(td);
+            });
+
+            table.appendChild(tr);
+          });
+        };
+
+        window.getData = getData;
+        window.getData10 = getData10;
+      })();
+    </script>
+  </body>
+</html>
